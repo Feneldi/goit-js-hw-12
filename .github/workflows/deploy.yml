@@ -1,0 +1,27 @@
+name: Build and deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main] # Тобто деплой буде відбуватись після пушу в основну гілку (main)
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # Використовуємо останню версію Ubuntu для CI/CD
+
+    permissions:
+      contents: write # дає github-actions право пушити
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2 # Використовуємо найновішу стабільну версію для checkout
+
+      - name: Install and build 🔧
+        run: |
+          npm install  # Встановлюємо залежності
+          npm run build  # Створюємо зібрану версію проекту (залежно від налаштувань в package.json)
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.0 # Деплой на GitHub Pages
+        with:
+          branch: gh-pages # Використовуємо гілку gh-pages для публікації
+          folder: dist # Вказуємо директорію, з якої будуть публікуватись файли на GitHub Pages

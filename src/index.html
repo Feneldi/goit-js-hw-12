@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HW #11</title>
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+
+  <body>
+    <main>
+      <div class="container">
+        <form id="search-form" class="form">
+          <label for="breed-input">Select a picture:</label>
+          <input
+            type="text"
+            name="query"
+            placeholder="Search images..."
+            required
+            list="breeds-list"
+            id="breed-input"
+            autocomplete="off"
+          />
+          <datalist id="breeds-list"></datalist>
+          <button type="submit">Search</button>
+        </form>
+        <ul class="gallery"></ul>
+        <span class="loader"></span>
+      </div>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

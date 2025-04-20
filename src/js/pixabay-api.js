@@ -12,14 +12,18 @@ const myApiKey = "49804709-aae3b3a79effefed9454c2d6d";
  * @param {string} query - Поисковая строка (например, "cat", "nature" и т.д.).
  * @returns {Promise<Array<Object>>} Промис с массивом объектов изображений (hits).
  */
-export function getImagesByQuery(query) {
-  return axios("https://pixabay.com/api/", {
+export async function getImagesByQuery(query, page = 1) {
+  const response = await axios("https://pixabay.com/api/", {
     params: {
       key: myApiKey,
       q: query,
       image_type: "photo",
       orientation: "horizontal",
       safesearch: true,
+      page: page,
+      per_page: 15,
     },
-  }).then(response => response.data.hits);
+  });
+
+  return response.data;
 }

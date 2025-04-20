@@ -79,18 +79,6 @@ export function appendToGallery(images) {
 
   galleryContainer.insertAdjacentHTML('beforeend', markup);
   lightbox.refresh();
-  scrollToNewContent();
-}
-
-function scrollToNewContent() {
-  const firstCard = document.querySelector(".gallery .gallery-item");
-  if (firstCard) {
-    const cardHeight = firstCard.getBoundingClientRect().height;
-    window.scrollBy({
-      top: cardHeight * 2,
-      behavior: "smooth",
-    });
-  }
 }
 
 /**

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HW #11</title>
+    <title>HW #12</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
 
@@ -12,7 +12,8 @@
     <main>
       <div class="container">
         <form id="search-form" class="form">
-          <label for="breed-input">Select a picture:</label>
+          <label class="breed-input" for="breed-input">Search images:</label>
+
           <input
             type="text"
             name="query"
@@ -27,7 +28,10 @@
         </form>
         <ul class="gallery"></ul>
         <span class="loader"></span>
+        <button type="button" class="load-more">Load more</button>
       </div>
+
+      <!-- <button class="scroll-to-top" aria-label="Scroll to top"></button> -->
     </main>
     <script type="module" src="./main.js"></script>
   </body>

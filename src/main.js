@@ -1,32 +1,28 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-
 import { getImagesByQuery } from './js/pixabay-api';
 import {
-  createGallery,
+  appendToGallery,
   clearGallery,
-  updateDatalist,
   showLoader,
   hideLoader,
+  showLoadMoreButton,
+  hideLoadMoreButton,
+  updateDatalist,
+  lightbox,
 } from './js/render-functions';
-
 
 const form = document.querySelector('#search-form');
 const input = form.elements['query'];
-const gallery = document.querySelector('.gallery');
+const loadMoreBtn = document.querySelector('.load-more');
 
-const lightbox = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
-  captionDelay: 250,
-});
+let page = 1;
+const perPage = 15;
+let totalImages = 0;
 
 form.addEventListener('submit', async e => {
   e.preventDefault();
   const query = input.value.trim();
-
-  updateURL(query);
 
   if (!query) {
     iziToast.warning({
@@ -37,13 +33,26 @@ form.addEventListener('submit', async e => {
     return;
   }
 
-  clearGallery();
+  page = 1;
+  await fetchImages(query);
+});
+
+loadMoreBtn.addEventListener('click', async () => {
+  page++;
+  await fetchImages(input.value.trim());
+});
+
+async function fetchImages(query) {
   showLoader();
+  hideLoadMoreButton();
 
   try {
-    const data = await getImagesByQuery(query);
+    const response = await getImagesByQuery(query, page);
+    const data = response.hits;
 
-    if (data.length === 0) {
+    if (page === 1) clearGallery();
+
+    if (data.length === 0 && page === 1) {
       iziToast.info({
         message: 'No results found.',
         position: 'topRight',
@@ -52,14 +61,25 @@ form.addEventListener('submit', async e => {
       return;
     }
 
-    createGallery(data);
+    appendToGallery(data);
     lightbox.refresh();
 
-    const tags = data
-      .flatMap(img => img.tags.split(','))
-      .map(t => t.trim().toLowerCase());
+    const tags = data.flatMap(img => img.tags.split(',')).map(t => t.trim().toLowerCase());
     const uniqueTags = [...new Set(tags)].slice(0, 10);
     updateDatalist(uniqueTags);
+
+    totalImages = response.totalHits;
+    if (totalImages > perPage * page) {
+      showLoadMoreButton();
+    } else if (page !== 1) {
+      iziToast.info({
+        message: `We're sorry, but you've reached the end of search results.`,
+        position: 'topRight',
+        timeout: 2000,
+      });
+    }
+
+    updateURL(query, page);
 
   } catch (error) {
     iziToast.error({
@@ -70,24 +90,24 @@ form.addEventListener('submit', async e => {
   } finally {
     hideLoader();
   }
-});
+}
 
-// Сохранение запроса в URL
-function updateURL(query) {
+function updateURL(query, page) {
   const url = new URL(window.location);
-  if (query) {
-    url.searchParams.set('q', query);
-  } else {
-    url.searchParams.delete('q');
-  }
+  if (query) url.searchParams.set('q', query);
+  if (page > 1) url.searchParams.set('p', page);
+  else url.searchParams.delete('p');
   history.pushState({}, '', url);
 }
 
-// Загрузка из URL при старте
 window.addEventListener('DOMContentLoaded', () => {
-  const urlQuery = new URLSearchParams(window.location.search).get('q');
+  input.focus();
+  const params = new URLSearchParams(window.location.search);
+  const urlQuery = params.get('q');
+  page = parseInt(params.get('p')) || 1;
+
   if (urlQuery) {
     input.value = urlQuery;
-    form.dispatchEvent(new Event('submit'));
+    fetchImages(urlQuery);
   }
 });

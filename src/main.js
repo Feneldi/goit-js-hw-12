@@ -40,7 +40,19 @@ form.addEventListener('submit', async e => {
 loadMoreBtn.addEventListener('click', async () => {
   page++;
   await fetchImages(input.value.trim());
+  scrollToNewContent();
 });
+
+function scrollToNewContent() {
+  const firstCard = document.querySelector(".gallery .gallery-item");
+  if (firstCard) {
+    const cardHeight = firstCard.getBoundingClientRect().height;
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: "smooth",
+    });
+  }
+}
 
 async function fetchImages(query) {
   showLoader();
